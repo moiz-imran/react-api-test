@@ -1,0 +1,33 @@
+{
+  "name": "react-test",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start:dev": "nodemon ./bin/www",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/moizwasti/react-api-test.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/moizwasti/react-api-test/issues"
+  },
+  "homepage": "https://github.com/moizwasti/react-api-test#readme",
+  "dependencies": {
+    "body-parser": "^1.18.2",
+    "dotenv": "^5.0.1",
+    "express": "^4.16.2",
+    "morgan": "^1.9.0",
+    "pg": "^7.4.1",
+    "pg-hstore": "^2.3.2",
+    "sequelize": "^4.35.2"
+  },
+  "devDependencies": {
+    "nodemon": "^1.17.1"
+  }
+}
