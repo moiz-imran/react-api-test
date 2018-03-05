@@ -11,7 +11,10 @@ module.exports = (sequelize, DataTypes) => {
   }, { timestamps: false });
 
   Film.associate = (models) => {
-    // associations can be defined here
+    Film.hasMany(models.Rating, {
+      foreignKey: 'filmId',
+      as: 'ratings'
+    });
   };
   return Film;
 };

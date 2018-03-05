@@ -1,4 +1,5 @@
 const Film = require('../models').Film;
+const Rating = require('../models').Rating;
 
 module.exports = {
     create(req, res) {
@@ -14,14 +15,24 @@ module.exports = {
 
     list(req, res) {
         return Film
-            .findAll()
+            .findAll({
+                include: [{
+                    model: Rating,
+                    as: 'ratings',
+                }],
+            })
             .then(films => res.status(200).send(films))
             .catch(error => res.status(400).send(error));
     },
 
     retrieve(req, res) {
         return Film
-            .findById(req.params.id)
+            .findById(req.params.filmId, {
+                include: [{
+                    model: Rating,
+                    as: 'ratings',
+                }],
+            })
             .then(film => {
                 if (!film) {
                     return res.status(404).send({
@@ -35,7 +46,12 @@ module.exports = {
 
     update(req, res) {
         return Film
-            .findById(req.params.id)
+            .findById(req.params.filmId, {
+                include: [{
+                    model: Rating,
+                    as: 'ratings',
+                }],
+            })
             .then(film => {
                 if (!film) {
                     return res.status(404).send({
@@ -54,9 +70,10 @@ module.exports = {
             })
             .catch((error) => res.status(400).send(error));
     },
+
     destroy(req, res) {
         return Film
-            .findById(req.params.id)
+            .findById(req.params.filmId)
             .then(film => {
                 if (!film) {
                     return res.status(400).send({
