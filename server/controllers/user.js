@@ -13,7 +13,7 @@ module.exports = {
                 last_name: req.body.last_name,
                 password: bcrypt.hashSync(req.body.password, bcrypt.genSaltSync())
             })
-            .then(user => res.status(201).json(jwt.sign({ email: user.email, username: user.username, uuid: user.uuid }, 'RESTFULAPIs')))
+            .then(user => res.status(201).json(jwt.sign({ uuid: user.uuid }, 'RESTFULAPIs')))
             .catch(error => res.status(400).send(error));
     },
 
@@ -33,11 +33,18 @@ module.exports = {
                     if (!user.comparePassword(req.body.password)) {
                         return res.status(401).send({ message: 'Authentication failed. Wrong password.' });
                     } else {
-                        return res.status(200).json(jwt.sign({ email: user.email, username: user.username, uuid: user.uuid }, 'RESTFULAPIs'));
+                        req.login(user, function(err) {
+                            if (err) { return next(err); }
+                            return res.status(200).json(jwt.sign({ uuid: user.uuid }, 'RESTFULAPIs'));
+                        })
                     }
                 }                
             })
             .catch(error => res.status(400).send(error));
+    },
+
+    getJWT(req, res) {
+        return res.status(200).json(jwt.sign({ uuid: req.user.dataValues.uuid }, 'RESTFULAPIs'));
     },
 
     //-------------------------------------DEV METHODS--------------------------------------

@@ -2,8 +2,8 @@ const express = require('express');
 const logger = require('morgan');
 const bodyParser = require('body-parser');
 const passport = require('passport');
-const User = require('./server/models/user');
-const jwt = require('jsonwebtoken');
+const session = require('express-session');
+const User = require('./server/models').User;
 
 // Set up the express app
 const app = express();
@@ -15,8 +15,30 @@ app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
+app.use(session({
+    secret: 'My session secret',
+    resave: true,
+    saveUninitialized: false
+}));
+
 //Passport
 app.use(passport.initialize());
+app.use(passport.session());
+
+passport.serializeUser(function (user, done) {
+    done(null, user.uuid);
+});
+
+passport.deserializeUser(function (id, done) {
+    User.findOne({
+        where: {
+            uuid: id
+        }
+    })
+        .then(user => done(null, user))
+        .catch(error => done(error, null))
+});
+
 
 //Connect to database
 const models = require("./server/models");
@@ -40,20 +62,6 @@ app.use(function (req, res, next) {
     res.setHeader('Access-Control-Allow-Credentials', true);
     // Pass to next layer of middleware
     next();
-});
-
-//Check for JWT token
-app.use(function (req, res, next) {
-    if(req.headers && req.headers.authorization && req.headers.authorization.split(' ')[0] === 'JWT') {
-        jwt.verify(req.headers.authorization.split(' ')[1], 'RESTFULAPIs', function(err, decode) {
-            if(err) req.user = undefined;
-            req.user = decode;
-            next();
-        });
-    } else {
-        req.user = undefined;
-        next();
-    }
 });
 
 // Setup a default catch-all route that sends back a welcome message in JSON format.
