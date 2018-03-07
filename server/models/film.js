@@ -7,7 +7,12 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false
     },
     description: DataTypes.STRING,
-    year: DataTypes.INTEGER,
+    year: {
+      type: DataTypes.INTEGER,
+      validate: {
+        is: /^(18|19|20)[0-9][0-9]/
+      }
+    },
     img_url: {
       type: DataTypes.STRING,
       validate: {

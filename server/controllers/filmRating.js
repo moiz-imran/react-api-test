@@ -1,41 +1,33 @@
 const Rating = require('../models').Rating;
-const Film = require('../models').Film;
 
 module.exports = {
     create(req, res) {
-        return Film
-            .findOne({
-                where: {
-                    id: req.body.filmId
-                }
+        return Rating
+            .create({
+                score: req.body.score,
+                filmId: req.params.filmId,
             })
-            .then(film => {
-                if (!film) {
-                    return res.status(404).send({ message: "Film not found!" })
-                }
-                return Rating
-                    .create({
-                        score: req.body.score,
-                        filmId: req.body.filmId,
-                    })
-                    .then(rating => res.status(201).send(rating))
-                    .catch(error => res.status(400).send(error));
-            })
+            .then(rating => res.status(201).send(rating))
             .catch(error => res.status(400).send(error));
     },
 
     list(req, res) {
         return Rating
-            .findAll()
+            .findAll({
+                where: {
+                    filmId: req.params.filmId
+                }
+            })
             .then(ratings => res.status(200).send(ratings))
-            .catch(error => res.status(400).send(error));            
+            .catch(error => res.status(400).send(error));
     },
 
     retrieve(req, res) {
         return Rating
-            .findOne({
+            .find({
                 where: {
                     id: req.params.ratingId,
+                    filmId: req.params.filmId
                 }
             })
             .then(rating => {
@@ -51,9 +43,10 @@ module.exports = {
 
     update(req, res) {
         return Rating
-            .findOne({
+            .find({
                 where: {
                     id: req.params.ratingId,
+                    filmId: req.params.filmId
                 }
             })
             .then(rating => {
@@ -64,8 +57,7 @@ module.exports = {
                 }
                 return rating
                     .update({
-                        score: req.body.score || rating.score,
-                        filmId: req.body.filmId || rating.filmId
+                        score: req.body.score || rating.score
                     })
                     .then(() => res.status(200).send(rating))
                     .catch((error) => res.status(400).send(error));
@@ -78,6 +70,7 @@ module.exports = {
             .find({
                 where: {
                     id: req.params.ratingId,
+                    filmId: req.params.filmId
                 }
             })
             .then(rating => {
