@@ -19,6 +19,9 @@ module.exports = {
       },
       img_url: {
         type: Sequelize.STRING
+      },
+      average_score: {
+        type: Sequelize.FLOAT
       }
     });
   },

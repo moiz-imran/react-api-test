@@ -17,8 +17,12 @@ app.use(bodyParser.urlencoded({ extended: false }));
 
 app.use(session({
     secret: 'My session secret',
-    resave: true,
-    saveUninitialized: false
+    resave: false,
+    saveUninitialized: false,
+    name: 'sessionid',
+    cookie: {
+        path: '/api/accounts'
+    }
 }));
 
 //Passport
@@ -50,6 +54,7 @@ models.sequelize.authenticate().then(() => {
     });
 
 // CORS
+app.disable('x-powered-by');
 app.use(function (req, res, next) {
     // Website you wish to allow to connect
     res.setHeader('Access-Control-Allow-Origin', '*');

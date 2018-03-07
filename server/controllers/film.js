@@ -17,15 +17,23 @@ module.exports = {
     list(req, res) {
         return Film
             .findAll({
-                // attributes: {include: [[Sequelize.fn('AVG', Sequelize.col('ratings.score')), 'average_score']]},
-                // group: ["Film.id"],
                 include: [{
                     model: Rating,
                     as: 'ratings',
-                    // attributes: []
+                    attributes: { exclude: 'filmId' }
                 }],
             })
-            .then(films => res.status(200).send(films))
+            .then(films => {
+                const getScore = async() => {
+                    for(let film of films) {
+                        await Rating.aggregate('score', 'avg', { where: { filmId: film.id }, dataType: Sequelize.FLOAT })
+                            .then(score => { film.setDataValue('average_score', score); })
+                            .catch(err => {});
+                    }
+                    res.status(200).send(films)
+                }
+                getScore();
+            })
             .catch(error => res.status(400).send(error));
     },
 
@@ -35,6 +43,7 @@ module.exports = {
                 include: [{
                     model: Rating,
                     as: 'ratings',
+                    attributes: { exclude: 'filmId' }
                 }],
             })
             .then(film => {
@@ -43,7 +52,13 @@ module.exports = {
                         message: 'Film Not Found',
                     });
                 }
-                return res.status(200).send(film);
+                const getScore = async () => {
+                    await Rating.aggregate('score', 'avg', { where: { filmId: film.id }, dataType: Sequelize.FLOAT })
+                        .then(score => { film.setDataValue('average_score', score); })
+                        .catch(err => { });
+                    res.status(200).send(film)
+                }
+                getScore();
             })
             .catch(error => res.status(400).send(error));
     },
@@ -69,7 +84,15 @@ module.exports = {
                         year: req.body.year || film.year,
                         img_url: req.body.img_url || film.img_url
                     })
-                    .then(() => res.status(200).send(film))
+                    .then(() => {
+                        const getScore = async () => {
+                            await Rating.aggregate('score', 'avg', { where: { filmId: film.id }, dataType: Sequelize.FLOAT })
+                                .then(score => { film.setDataValue('average_score', score); })
+                                .catch(err => { });
+                            res.status(200).send(film)
+                        }
+                        getScore();
+                    })
                     .catch((error) => res.status(400).send(error));
             })
             .catch((error) => res.status(400).send(error));

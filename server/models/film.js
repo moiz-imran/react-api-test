@@ -1,4 +1,5 @@
 'use strict';
+
 module.exports = (sequelize, DataTypes) => {
   const Film = sequelize.define('Film', {
     title: {
@@ -7,7 +8,8 @@ module.exports = (sequelize, DataTypes) => {
     },
     description: DataTypes.STRING,
     year: DataTypes.INTEGER,
-    img_url: DataTypes.STRING
+    img_url: DataTypes.STRING,
+    average_score: DataTypes.FLOAT
   }, { timestamps: false });
 
   Film.associate = (models) => {
@@ -16,5 +18,6 @@ module.exports = (sequelize, DataTypes) => {
       as: 'ratings'
     });
   };
+
   return Film;
 };
