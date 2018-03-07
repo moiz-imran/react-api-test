@@ -8,7 +8,12 @@ module.exports = (sequelize, DataTypes) => {
     },
     description: DataTypes.STRING,
     year: DataTypes.INTEGER,
-    img_url: DataTypes.STRING,
+    img_url: {
+      type: DataTypes.STRING,
+      validate: {
+        isUrl: true
+      }
+    },
     average_score: DataTypes.FLOAT
   }, { timestamps: false });
 

@@ -5,16 +5,20 @@ const Op = require('sequelize').Op;
 
 module.exports = {
     signup(req, res) {
-        return User
-            .create({
-                username: req.body.username,
-                email: req.body.email,
-                first_name: req.body.first_name,
-                last_name: req.body.last_name,
-                password: bcrypt.hashSync(req.body.password, bcrypt.genSaltSync())
-            })
-            .then(user => res.status(201).json(jwt.sign({ uuid: user.uuid }, 'RESTFULAPIs')))
-            .catch(error => res.status(400).send(error));
+        if (req.body.password1 === req.body.password2) {
+            return User
+                .create({
+                    username: req.body.username,
+                    email: req.body.email,
+                    first_name: req.body.first_name,
+                    last_name: req.body.last_name,
+                    raw_password: req.body.password1
+                })
+                .then(user => res.status(201).json(jwt.sign({ uuid: user.uuid }, 'RESTFULAPIs')))
+                .catch(error => res.status(400).send(error));
+        } else {
+            return res.status(401).send({ message: 'Sign up failed. Passwords don\'t match.' });
+        }
     },
 
     login(req, res) {

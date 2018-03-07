@@ -11,13 +11,36 @@ module.exports = (sequelize, DataTypes) => {
     username: {
       type: DataTypes.STRING,
       allowNull: false,
-      unique: true
+      unique: true,
+      validate: {
+        is: /^\S*$/
+      }
     },
-    password: DataTypes.STRING,
+    raw_password: {
+      type: DataTypes.VIRTUAL,
+      validate: {
+        is: /^(?=.*[0-9])(?=.*[a-zA-Z])(^\S*)$/,
+        len: 8
+      },
+      set: function(val) {
+        this.setDataValue('raw_password', val)
+        this.setDataValue('password', bcrypt.hashSync(val, bcrypt.genSaltSync()))
+      }
+    },
+    password: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      validate: {
+        notEmpty: true
+      }
+    },
     email: {
       type: DataTypes.STRING,
       allowNull: false,
-      unique: true
+      unique: true,
+      validate: {
+        isEmail: true,
+      }
     },
     first_name: DataTypes.STRING,
     last_name: DataTypes.STRING
