@@ -2,6 +2,8 @@ const filmController = require('../controllers').film;
 const ratingController = require('../controllers').rating;
 const userController = require('../controllers').user;
 const passport = require('passport');
+let multer = require('multer');
+let upload = multer();
 
 require('../middleware/passport')(passport)
 
@@ -11,7 +13,7 @@ module.exports = (app) => {
     }));
 
     app.route('/api/films')
-        .post(passport.authenticate('jwt', { session: false }), filmController.create)
+        .post(passport.authenticate('jwt', { session: false }), upload.fields([]), filmController.create)
         .get(passport.authenticate('jwt', { session: false }), filmController.list);
 
     app.route('/api/films/:filmId')
@@ -20,7 +22,7 @@ module.exports = (app) => {
         .delete(passport.authenticate('jwt', { session: false }), filmController.destroy);
 
     app.route('/api/films/:filmId/ratings')
-        .post(passport.authenticate('jwt', { session: false }), ratingController.create)
+        .post(passport.authenticate('jwt', { session: false }), upload.fields([]), ratingController.create)
         .get(passport.authenticate('jwt', { session: false }), ratingController.list);
 
     app.route('/api/films/:filmId/ratings/:ratingId')
@@ -28,8 +30,8 @@ module.exports = (app) => {
         .put(passport.authenticate('jwt', { session: false }), ratingController.update)
         .delete(passport.authenticate('jwt', { session: false }), ratingController.destroy);
 
-    app.post('/api/accounts/signup', userController.signup);
-    app.post('/api/accounts/login', userController.login);
+    app.post('/api/accounts/signup', upload.fields([]), userController.signup);
+    app.post('/api/accounts/login', upload.fields([]), userController.login);
     app.get('/api/accounts/jwt', userController.getJWT);
     app.get('/api/accounts/logout', userController.logout);
     app.get('/api/accounts/profile', passport.authenticate('jwt', { session: false }), userController.retrieve);
