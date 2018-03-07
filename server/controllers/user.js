@@ -43,8 +43,66 @@ module.exports = {
             .catch(error => res.status(400).send(error));
     },
 
+    logout(req, res) {
+        if (req.user) {
+            return User
+                .findOne({
+                    where: {
+                        uuid: req.user.dataValues.uuid
+                    }
+                })
+                .then(user => {
+                    if (!user) {
+                        return res.status(401).send({ message: 'Logout failed. No user logged in.' })
+                    }
+                    req.logout();
+                    return res.status(200).json(jwt.sign({ uuid: user.uuid }, 'RESTFULAPIs'));
+                })
+                .catch(error => res.status(400).send(error));
+        } else {
+            return res.status(401).send({ message: 'Logout failed. No user logged in.' })
+        }        
+    },
+
     getJWT(req, res) {
-        return res.status(200).json(jwt.sign({ uuid: req.user.dataValues.uuid }, 'RESTFULAPIs'));
+        if (req.user) {
+            return User
+                .findOne({
+                    where: {
+                        uuid: req.user.dataValues.uuid
+                    }
+                })
+                .then(user => {
+                    if(!user) {
+                        return res.status(401).send({ message: 'Not authorized. Need to login.' })                    
+                    }
+                    return res.status(200).json(jwt.sign({ uuid: user.uuid }, 'RESTFULAPIs'));
+                })
+                .catch(error => res.status(400).send(error));
+        } else {
+            return res.status(401).send({ message: 'Not authorized. Need to login.' })
+        }
+    },
+
+    retrieve(req, res) {
+        if (req.user) {
+            return User
+                .findOne({
+                    where: {
+                        uuid: req.user.dataValues.uuid
+                    },
+                    attributes: { exclude: 'password' }
+                })
+                .then(user => {
+                    if (!user) {
+                        return res.status(401).send({ message: 'Not authorized. Need to login.' })
+                    }
+                    return res.status(200).send(user);
+                })
+                .catch(error => res.status(400).send(error));
+        } else {
+            return res.status(401).send({ message: 'Not authorized. Need to login.' })
+        }
     },
 
     //-------------------------------------DEV METHODS--------------------------------------

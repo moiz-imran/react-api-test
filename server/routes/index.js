@@ -31,6 +31,8 @@ module.exports = (app) => {
     app.post('/api/accounts/signup', userController.signup);
     app.post('/api/accounts/login', userController.login);
     app.get('/api/accounts/jwt', userController.getJWT);
+    app.get('/api/accounts/logout', userController.logout);
+    app.get('/api/accounts/profile', passport.authenticate('jwt', { session: false }), userController.retrieve);
 
     //dev
     app.get('/api/accounts', userController.list);
