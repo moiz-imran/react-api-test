@@ -169,27 +169,5 @@ module.exports = {
         } else {
             return res.status(401).send({ message: 'Sign up failed. Passwords don\'t match.' });
         }
-    },
-
-    //-------------------------------------DEV METHODS--------------------------------------
-    list(req, res) {
-        return User
-            .findAll()
-            .then(users => res.status(200).send(users))
-            .catch(error => res.status(400).send(error));
-    },
-    destroy(req, res) {
-        return User
-            .findOne({
-                username: req.params.username
-            })
-            .then(user => {
-                return user
-                    .destroy()
-                    .then(() => res.status(204).send())
-                    .catch(error => res.status(400).send(error));
-            })
-            .catch(error => res.status(400).send(error));
     }
-    //---------------------------------------------------------------------------------------
 }
