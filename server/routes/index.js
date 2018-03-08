@@ -45,8 +45,10 @@ module.exports = (app) => {
     app.get('/api/accounts/jwt', userController.getJWT);
     app.get('/api/accounts/logout', userController.logout);
     app.get('/api/accounts/profile', passport.authenticate('jwt', { session: false }), userController.retrieve);
+    app.put('/api/accounts/profile', passport.authenticate('jwt', { session: false }), upload.fields([]), userController.update);
+    app.put('/api/accounts/profile/changepassword', passport.authenticate('jwt', { session: false }), upload.fields([]), userController.changePassword);
 
-    //dev
+    //dev methods
     app.get('/api/accounts', userController.list);
     app.delete('/api/accounts/:username', userController.destroy);
 };

@@ -54,8 +54,10 @@ models.sequelize.authenticate().then(() => {
         console.error('Unable to connect to SQL database: ', process.env.DB_NAME, err);
     });
 
-// CORS
 app.disable('x-powered-by');
+app.disable('etag');
+
+// CORS
 app.use(function (req, res, next) {
     // Website you wish to allow to connect
     res.setHeader('Access-Control-Allow-Origin', '*');
