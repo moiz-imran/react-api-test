@@ -2,6 +2,7 @@ const Film = require('../models').Film;
 const Rating = require('../models').Rating;
 const Sequelize = require('sequelize');
 const queryString = require('querystring');
+const Op = require('sequelize').Op;
 
 module.exports = {
     create(req, res) {
@@ -17,12 +18,12 @@ module.exports = {
 
     list(req, res) {
         const filterObj = {};
-        if (req.query.ids) filterObj.id = { $in: queryString.unescape(req.query.ids).split(',') };
+        if (req.query.ids) filterObj.id = { [Op.in] : queryString.unescape(req.query.ids).split(',') };
         req.query.min_year = isNaN(req.query.min_year) ? '' : req.query.min_year;
         req.query.max_year = isNaN(req.query.max_year) ? '' : req.query.max_year;
-        filterObj.year = { $and: { $gte: req.query.min_year || 1800, $lte: req.query.max_year || (new Date()).getFullYear() } };
-        if (req.query.title) filterObj.title = { $like: '%' + req.query.title + '%' };
-        if (req.query.description) filterObj.description = { $like: '%' + req.query.description + '%' };
+        filterObj.year = { [Op.and] : { [Op.gte] : req.query.min_year || 1800, [Op.lte] : req.query.max_year || (new Date()).getFullYear() } };
+        if (req.query.title) filterObj.title = { [Op.iLike] : '%' + req.query.title + '%' };
+        if (req.query.description) filterObj.description = { [Op.iLike] : '%' + req.query.description + '%' };
 
         return Film
             .findAll({

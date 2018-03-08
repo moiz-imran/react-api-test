@@ -15,6 +15,11 @@
     "dialect": "mysql"
   },
   "production": {
-    "use_env_variable": "DATABASE_URL"
+    "username": "moizwasti",
+    "password": 2566,
+    "database": "films-dev",
+    "host": "localhost",
+    "port": "5432",
+    "dialect": "postgres"
   }
 }

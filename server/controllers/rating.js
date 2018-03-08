@@ -1,6 +1,7 @@
 const Rating = require('../models').Rating;
 const Film = require('../models').Film;
 const queryString = require('querystring');
+const Op = require('sequelize').Op;
 
 module.exports = {
     create(req, res) {
@@ -29,7 +30,7 @@ module.exports = {
         const filterObj = {};
         req.query.min_score = isNaN(req.query.min_score) ? 0 : req.query.min_score;
         req.query.max_score = isNaN(req.query.max_score) ? 10 : req.query.max_score;
-        filterObj.score = { $and: { $gte: req.query.min_score || 0, $lte: req.query.max_score || 10 } };
+        filterObj.score = { [Op.and] : { [Op.gte] : req.query.min_score || 0, [Op.lte] : req.query.max_score || 10 } };
         return Rating
             .findAll({
                 attributes: { exclude: 'filmId' },                
