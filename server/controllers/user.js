@@ -14,7 +14,7 @@ module.exports = {
                     last_name: req.body.last_name,
                     raw_password: req.body.password1
                 })
-                .then(user => res.status(201).json(jwt.sign({ uuid: user.uuid }, 'RESTFULAPIs')))
+                .then(user => res.status(201).json(jwt.sign({ uuid: user.uuid }, process.env.JWT_ENCRYPTION)))
                 .catch(error => res.status(400).send(error));
         } else {
             return res.status(401).send({ message: 'Sign up failed. Passwords don\'t match.' });
@@ -39,7 +39,7 @@ module.exports = {
                     } else {
                         req.login(user, function(err) {
                             if (err) { return next(err); }
-                            return res.status(200).json(jwt.sign({ uuid: user.uuid }, 'RESTFULAPIs'));
+                            return res.status(200).json(jwt.sign({ uuid: user.uuid }, process.env.JWT_ENCRYPTION));
                         })
                     }
                 }                
@@ -60,7 +60,7 @@ module.exports = {
                         return res.status(401).send({ message: 'Logout failed. No user logged in.' })
                     }
                     req.logout();
-                    return res.status(200).json(jwt.sign({ uuid: user.uuid }, 'RESTFULAPIs'));
+                    return res.status(200).json(jwt.sign({ uuid: user.uuid }, process.env.JWT_ENCRYPTION));
                 })
                 .catch(error => res.status(400).send(error));
         } else {
@@ -80,7 +80,7 @@ module.exports = {
                     if(!user) {
                         return res.status(401).send({ message: 'Not authorized. Need to login.' })                    
                     }
-                    return res.status(200).json(jwt.sign({ uuid: user.uuid }, 'RESTFULAPIs'));
+                    return res.status(200).json(jwt.sign({ uuid: user.uuid }, process.env.JWT_ENCRYPTION));
                 })
                 .catch(error => res.status(400).send(error));
         } else {

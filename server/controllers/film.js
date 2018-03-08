@@ -1,6 +1,7 @@
 const Film = require('../models').Film;
 const Rating = require('../models').Rating;
 const Sequelize = require('sequelize');
+const queryString = require('querystring');
 
 module.exports = {
     create(req, res) {
@@ -15,8 +16,17 @@ module.exports = {
     },
 
     list(req, res) {
+        const filterObj = {};
+        if (req.query.ids) filterObj.id = { $in: queryString.unescape(req.query.ids).split(',') };
+        req.query.min_year = isNaN(req.query.min_year) ? '' : req.query.min_year;
+        req.query.max_year = isNaN(req.query.max_year) ? '' : req.query.max_year;
+        filterObj.year = { $and: { $gte: req.query.min_year || 1800, $lte: req.query.max_year || (new Date()).getFullYear() } };
+        if (req.query.title) filterObj.title = { $like: '%' + req.query.title + '%' };
+        if (req.query.description) filterObj.description = { $like: '%' + req.query.description + '%' };
+
         return Film
             .findAll({
+                where: filterObj,                    
                 include: [{
                     model: Rating,
                     as: 'ratings',
@@ -25,12 +35,40 @@ module.exports = {
             })
             .then(films => {
                 const getScore = async() => {
+                    let count = 0;
                     for(let film of films) {
+                        count++;
                         await Rating.aggregate('score', 'avg', { where: { filmId: film.id }, dataType: Sequelize.FLOAT })
                             .then(score => { film.setDataValue('average_score', score); })
                             .catch(err => {});
                     }
-                    res.status(200).send(films)
+                    const currentOffset = req.query.offset ? parseInt(req.query.offset) : 0;
+                    const currentLimit = req.query.limit ? parseInt(req.query.limit) : 1;
+
+                    let prevUrl = null;
+                    const prevOffset = currentOffset - currentLimit;
+                    if (prevOffset >= 0) {
+                        const prevQuery = req.query;
+                        prevQuery.offset = prevOffset;
+                        const prevQString = (queryString.stringify(prevQuery));
+                        prevUrl = "http://" + req.headers.host + req._parsedUrl.pathname + '?' + prevQString
+                    }
+                    
+                    let nextUrl = null;
+                    const nextOffset = currentOffset + currentLimit;
+                    if (nextOffset < count) {
+                        const nextQuery = req.query;
+                        nextQuery.offset = nextOffset;
+                        const nextQString = (queryString.stringify(nextQuery));
+                        nextUrl = "http://" + req.headers.host + req._parsedUrl.pathname + '?' + nextQString;
+                    }
+
+                    res.status(200).json({
+                        'count': count,
+                        'prev': prevUrl,
+                        'next': nextUrl,
+                        'results': films.slice(currentOffset, currentOffset+currentLimit)
+                    });
                 }
                 getScore();
             })

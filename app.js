@@ -4,6 +4,7 @@ const bodyParser = require('body-parser');
 const passport = require('passport');
 const session = require('express-session');
 const User = require('./server/models').User;
+require('dotenv').config();
 
 // Set up the express app
 const app = express();
@@ -47,10 +48,10 @@ passport.deserializeUser(function (id, done) {
 //Connect to database
 const models = require("./server/models");
 models.sequelize.authenticate().then(() => {
-    console.log('Connected to SQL database: films-dev');
+    console.log('Connected to SQL database: ', process.env.DB_NAME);
 })
     .catch(err => {
-        console.error('Unable to connect to SQL database: films-dev', err);
+        console.error('Unable to connect to SQL database: ', process.env.DB_NAME, err);
     });
 
 // CORS

@@ -5,7 +5,7 @@ const User = require('../models').User;
 module.exports = function (passport) {
     const opts = {};
     opts.jwtFromRequest = ExtractJwt.fromAuthHeaderWithScheme('jwt');
-    opts.secretOrKey = 'RESTFULAPIs';
+    opts.secretOrKey = process.env.JWT_ENCRYPTION;
 
     passport.use(new JwtStrategy(opts, function(jwt_payload, done) {
         return User
