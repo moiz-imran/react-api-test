@@ -43,7 +43,7 @@ module.exports = {
                             .catch(err => {});
                     }
                     const currentOffset = req.query.offset ? parseInt(req.query.offset) : 0;
-                    const currentLimit = req.query.limit ? parseInt(req.query.limit) : 1;
+                    const currentLimit = req.query.limit ? parseInt(req.query.limit) : 5;
 
                     let prevUrl = null;
                     const prevOffset = currentOffset - currentLimit;

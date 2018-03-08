@@ -1,4 +1,5 @@
 const Rating = require('../models').Rating;
+const queryString = require('querystring');
 
 module.exports = {
     create(req, res) {
@@ -12,13 +13,46 @@ module.exports = {
     },
 
     list(req, res) {
+        const filterObj = {};
+        req.query.min_score = isNaN(req.query.min_score) ? 0 : req.query.min_score;
+        req.query.max_score = isNaN(req.query.max_score) ? 10 : req.query.max_score;
+        filterObj.score = { $and: { $gte: req.query.min_score || 0, $lte: req.query.max_score || 10 } };
+        filterObj.filmId = req.params.filmId;
         return Rating
             .findAll({
-                where: {
-                    filmId: req.params.filmId
-                }
+                attributes: { exclude: 'filmId' },
+                where: filterObj
             })
-            .then(ratings => res.status(200).send(ratings))
+            .then(ratings => {
+                let count = ratings.length;
+                const currentOffset = req.query.offset ? parseInt(req.query.offset) : 0;
+                const currentLimit = req.query.limit ? parseInt(req.query.limit) : 5;
+
+                let prevUrl = null;
+                const prevOffset = currentOffset - currentLimit;
+                if (prevOffset >= 0) {
+                    const prevQuery = req.query;
+                    prevQuery.offset = prevOffset;
+                    const prevQString = (queryString.stringify(prevQuery));
+                    prevUrl = "http://" + req.headers.host + req._parsedUrl.pathname + '?' + prevQString
+                }
+
+                let nextUrl = null;
+                const nextOffset = currentOffset + currentLimit;
+                if (nextOffset < count) {
+                    const nextQuery = req.query;
+                    nextQuery.offset = nextOffset;
+                    const nextQString = (queryString.stringify(nextQuery));
+                    nextUrl = "http://" + req.headers.host + req._parsedUrl.pathname + '?' + nextQString;
+                }
+
+                res.status(200).json({
+                    'count': count,
+                    'prev': prevUrl,
+                    'next': nextUrl,
+                    'results': ratings.slice(currentOffset, currentOffset + currentLimit)
+                });
+            })
             .catch(error => res.status(400).send(error));
     },
 
