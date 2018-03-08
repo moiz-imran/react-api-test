@@ -4,7 +4,6 @@ const bodyParser = require('body-parser');
 const passport = require('passport');
 const session = require('express-session');
 const User = require('./server/models').User;
-require('dotenv').config();
 
 // Set up the express app
 const app = express();
