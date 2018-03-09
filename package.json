@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "migrate": "sequelize db:migrate",
     "start:dev": "nodemon ./bin/www",
     "start": "node ./bin/www",
     "test": "echo \"Error: no test specified\" && exit 1"

@@ -31,6 +31,12 @@ Create a .env file with the following definitions:
 
 * `JWT_ENCRYPTION` = (an encryption string)
 
+### Perform DB Migrations
+
+```
+npm run migrate
+```
+
 ## Run
 
 ```
