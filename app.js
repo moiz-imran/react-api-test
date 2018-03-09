@@ -15,6 +15,7 @@ app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
+// Establish session
 app.use(session({
     secret: 'My session secret',
     resave: false,
@@ -25,7 +26,7 @@ app.use(session({
     }
 }));
 
-//Passport
+//Passport initialization
 app.use(passport.initialize());
 app.use(passport.session());
 
@@ -53,7 +54,9 @@ models.sequelize.authenticate().then(() => {
         console.error('Unable to connect to SQL database: ', process.env.DB_NAME, err);
     });
 
+// Prevent against Express specific attacks
 app.disable('x-powered-by');
+
 app.disable('etag');
 
 // CORS
@@ -64,8 +67,7 @@ app.use(function (req, res, next) {
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
     // Request headers you wish to allow
     res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With, content-type, Authorization, Content-Type');
-    // Set to true if you need the website to include cookies in the requests sent
-    // to the API (e.g. in case you use sessions)
+    // Include cookies in requests (for session)
     res.setHeader('Access-Control-Allow-Credentials', true);
     // Pass to next layer of middleware
     next();
@@ -74,7 +76,7 @@ app.use(function (req, res, next) {
 // Setup a default catch-all route that sends back a welcome message in JSON format.
 require('./server/routes')(app);
 app.get('*', (req, res) => res.status(200).send({
-    message: 'Films API.',
+    message: 'Welcome to Films API.',
 }));
 
 module.exports = app;

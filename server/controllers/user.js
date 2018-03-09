@@ -4,7 +4,7 @@ const jwt = require('jsonwebtoken');
 const Op = require('sequelize').Op;
 
 module.exports = {
-    signup(req, res) {
+    signup(req, res) { // Create User (compares passwords, logs in)
         if (req.body.password1 === req.body.password2) {
             return User
                 .create({
@@ -26,7 +26,7 @@ module.exports = {
         }
     },
 
-    login(req, res) {
+    login(req, res) { // Check password against stored hash, logs in, returns user JWT
         return User
             .findOne({
                 where: {
@@ -52,7 +52,7 @@ module.exports = {
             .catch(error => res.status(400).send(error));
     },
 
-    logout(req, res) {
+    logout(req, res) { // logs out user from req.user
         if (req.user) {
             return User
                 .findOne({
@@ -73,7 +73,7 @@ module.exports = {
         }        
     },
 
-    getJWT(req, res) {
+    getJWT(req, res) { // return JWT for req.user
         if (req.user) {
             return User
                 .findOne({
@@ -93,7 +93,7 @@ module.exports = {
         }
     },
 
-    retrieve(req, res) {
+    retrieve(req, res) { // Returns profile for req.user
         if (req.user) {
             return User
                 .findOne({
@@ -114,7 +114,7 @@ module.exports = {
         }
     },
 
-    update(req, res) {
+    update(req, res) { // Updates profile for req.user
         if (req.user) {
             return User
                 .findOne({
@@ -142,7 +142,7 @@ module.exports = {
         }
     },
 
-    changePassword(req, res) {
+    changePassword(req, res) { // changes password for req.user
         if(req.body.newPassword1 === req.body.newPassword2) {
             if (req.user) {
                 return User

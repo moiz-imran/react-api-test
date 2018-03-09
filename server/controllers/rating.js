@@ -4,7 +4,7 @@ const queryString = require('querystring');
 const Op = require('sequelize').Op;
 
 module.exports = {
-    create(req, res) {
+    create(req, res) { // Creates rating for film from body
         return Film
             .findOne({
                 where: {
@@ -26,7 +26,7 @@ module.exports = {
             .catch(error => res.status(400).send(error));
     },
 
-    list(req, res) {
+    list(req, res) { // Lists all ratings (score filtering and pagination)
         const filterObj = {};
         req.query.min_score = isNaN(req.query.min_score) ? 0 : req.query.min_score;
         req.query.max_score = isNaN(req.query.max_score) ? 10 : req.query.max_score;
@@ -69,7 +69,7 @@ module.exports = {
             .catch(error => res.status(400).send(error));            
     },
 
-    retrieve(req, res) {
+    retrieve(req, res) { // Returns single rating by ID
         return Rating
             .findOne({
                 where: {
@@ -87,7 +87,7 @@ module.exports = {
             .catch(error => res.status(400).send(error));
     },
 
-    update(req, res) {
+    update(req, res) { // Updates single rating by ID
         return Rating
             .findOne({
                 where: {
@@ -111,7 +111,7 @@ module.exports = {
             .catch((error) => res.status(400).send(error));
     },
 
-    destroy(req, res) {
+    destroy(req, res) { // Deletes single rating by ID
         return Rating
             .find({
                 where: {

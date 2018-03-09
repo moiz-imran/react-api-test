@@ -5,7 +5,7 @@ const queryString = require('querystring');
 const Op = require('sequelize').Op;
 
 module.exports = {
-    create(req, res) {
+    create(req, res) { // Create new film
         return Film
             .create({
                 title: req.body.title,
@@ -16,7 +16,7 @@ module.exports = {
             .catch(error => res.status(400).send(error));
     },
 
-    list(req, res) {
+    list(req, res) { // List all films (filters, calculates avg score, adds pagination)
         const filterObj = {};
         if (req.query.ids) filterObj.id = { [Op.in] : queryString.unescape(req.query.ids).split(',') };
         req.query.min_year = isNaN(req.query.min_year) ? '' : req.query.min_year;
@@ -76,7 +76,7 @@ module.exports = {
             .catch(error => res.status(400).send(error));
     },
 
-    retrieve(req, res) {
+    retrieve(req, res) { // Returns a single Film according to ID (calculates avg score)
         return Film
             .findById(req.params.filmId, {
                 include: [{
@@ -102,7 +102,7 @@ module.exports = {
             .catch(error => res.status(400).send(error));
     },
 
-    update(req, res) {
+    update(req, res) { // Updates a single Film according to ID (calculates avg score to return Film)
         return Film
             .findById(req.params.filmId, {
                 include: [{
@@ -137,7 +137,7 @@ module.exports = {
             .catch((error) => res.status(400).send(error));
     },
 
-    destroy(req, res) {
+    destroy(req, res) { // Deletes a single film
         return Film
             .findById(req.params.filmId)
             .then(film => {
@@ -152,15 +152,5 @@ module.exports = {
                     .catch(error => res.status(400).send(error));
             })
             .catch(error => res.status(400).send(error));
-    },
-
-    loginRequired(req, res, next) {
-        if (req.user) {
-            console.log(req.user);
-            next();
-        } else {
-            return res.status(401).json({ message: 'Unauthorized user!' });
-        }
-    },
-
+    }
 };

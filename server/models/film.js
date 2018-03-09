@@ -10,7 +10,7 @@ module.exports = (sequelize, DataTypes) => {
     year: {
       type: DataTypes.INTEGER,
       validate: {
-        is: /^(18|19|20)[0-9][0-9]/
+        is: /^(18|19|20)[0-9][0-9]/ // Accept integers from 1800-2099 (oldest movie dates to 1888)
       }
     },
     img_url: {

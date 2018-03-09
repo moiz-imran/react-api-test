@@ -13,6 +13,7 @@ module.exports = (app) => {
         message: 'Welcome to the Films API!',
     }));
 
+    // Film routes
     app.route('/api/films')
         .post(passport.authenticate('jwt', { session: false }), upload.fields([]), filmController.create)
         .get(passport.authenticate('jwt', { session: false }), filmController.list);
@@ -22,6 +23,7 @@ module.exports = (app) => {
         .put(passport.authenticate('jwt', { session: false }), upload.fields([]), filmController.update)
         .delete(passport.authenticate('jwt', { session: false }), filmController.destroy);
 
+    // Film specific Rating routes
     app.route('/api/films/:filmId/ratings')
         .post(passport.authenticate('jwt', { session: false }), upload.fields([]), filmRatingController.create)
         .get(passport.authenticate('jwt', { session: false }), filmRatingController.list);
@@ -31,6 +33,7 @@ module.exports = (app) => {
         .put(passport.authenticate('jwt', { session: false }), upload.fields([]), filmRatingController.update)
         .delete(passport.authenticate('jwt', { session: false }), filmRatingController.destroy);
 
+    // General Rating routes
     app.route('/api/ratings')
         .post(passport.authenticate('jwt', { session: false }), upload.fields([]), ratingController.create)
         .get(passport.authenticate('jwt', { session: false }), ratingController.list);
@@ -39,7 +42,8 @@ module.exports = (app) => {
         .get(passport.authenticate('jwt', { session: false }), ratingController.retrieve)
         .put(passport.authenticate('jwt', { session: false }), upload.fields([]), ratingController.update)
         .delete(passport.authenticate('jwt', { session: false }), ratingController.destroy);
-        
+
+    // User routes
     app.post('/api/accounts/signup', upload.fields([]), userController.signup);
     app.post('/api/accounts/login', upload.fields([]), userController.login);
     app.get('/api/accounts/jwt', userController.getJWT);

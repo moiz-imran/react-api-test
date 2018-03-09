@@ -13,18 +13,18 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false,
       unique: true,
       validate: {
-        is: /^\S*$/
+        is: /^\S*$/ // Check for no spaces
       }
     },
     raw_password: {
       type: DataTypes.VIRTUAL,
       validate: {
-        is: /^(?=.*[0-9])(?=.*[a-zA-Z])(^\S*)$/,
+        is: /^(?=.*[0-9])(?=.*[a-zA-Z])(^\S*)$/, // Atleast one number and one alphabet. No spaces.
         len: 8
       },
       set: function(val) {
         this.setDataValue('raw_password', val)
-        this.setDataValue('password', bcrypt.hashSync(val, bcrypt.genSaltSync()))
+        this.setDataValue('password', bcrypt.hashSync(val, bcrypt.genSaltSync())) // Password stored as hash
       }
     },
     password: {
@@ -46,11 +46,8 @@ module.exports = (sequelize, DataTypes) => {
     last_name: DataTypes.STRING
   }, { timestamps: false });
 
-  User.associate = function(models) {
-    // associations can be defined here
-  };
-
   User.prototype.comparePassword = function(password) {
+    // Compare given password against stored hash
     return bcrypt.compareSync(password, this.password);
   }
 
