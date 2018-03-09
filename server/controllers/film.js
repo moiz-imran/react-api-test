@@ -27,6 +27,9 @@ module.exports = {
 
         return Film
             .findAll({
+                attributes: {
+                    include: [[Sequelize.cast(Sequelize.literal('(SELECT AVG("Ratings"."score") FROM "Ratings" WHERE "Ratings"."filmId" = "Film"."id")'), 'float'), 'average_score']]
+                },
                 where: filterObj,                    
                 include: [{
                     model: Rating,
@@ -35,43 +38,34 @@ module.exports = {
                 }],
             })
             .then(films => {
-                const getScore = async() => {
-                    let count = 0;
-                    for(let film of films) {
-                        count++;
-                        await Rating.aggregate('score', 'avg', { where: { filmId: film.id }, dataType: Sequelize.FLOAT })
-                            .then(score => { film.setDataValue('average_score', score); })
-                            .catch(err => {});
-                    }
-                    const currentOffset = req.query.offset ? parseInt(req.query.offset) : 0;
-                    const currentLimit = req.query.limit ? parseInt(req.query.limit) : 5;
+                let count = films.length;
+                const currentOffset = req.query.offset ? parseInt(req.query.offset) : 0;
+                const currentLimit = req.query.limit ? parseInt(req.query.limit) : 5;
 
-                    let prevUrl = null;
-                    const prevOffset = currentOffset - currentLimit;
-                    if (prevOffset >= 0) {
-                        const prevQuery = req.query;
-                        prevQuery.offset = prevOffset;
-                        const prevQString = (queryString.stringify(prevQuery));
-                        prevUrl = "http://" + req.headers.host + req._parsedUrl.pathname + '?' + prevQString
-                    }
-                    
-                    let nextUrl = null;
-                    const nextOffset = currentOffset + currentLimit;
-                    if (nextOffset < count) {
-                        const nextQuery = req.query;
-                        nextQuery.offset = nextOffset;
-                        const nextQString = (queryString.stringify(nextQuery));
-                        nextUrl = "http://" + req.headers.host + req._parsedUrl.pathname + '?' + nextQString;
-                    }
-
-                    res.status(200).json({
-                        'count': count,
-                        'prev': prevUrl,
-                        'next': nextUrl,
-                        'results': films.slice(currentOffset, currentOffset+currentLimit)
-                    });
+                let prevUrl = null;
+                const prevOffset = currentOffset - currentLimit;
+                if (prevOffset >= 0) {
+                    const prevQuery = req.query;
+                    prevQuery.offset = prevOffset;
+                    const prevQString = (queryString.stringify(prevQuery));
+                    prevUrl = "http://" + req.headers.host + req._parsedUrl.pathname + '?' + prevQString
                 }
-                getScore();
+                
+                let nextUrl = null;
+                const nextOffset = currentOffset + currentLimit;
+                if (nextOffset < count) {
+                    const nextQuery = req.query;
+                    nextQuery.offset = nextOffset;
+                    const nextQString = (queryString.stringify(nextQuery));
+                    nextUrl = "http://" + req.headers.host + req._parsedUrl.pathname + '?' + nextQString;
+                }
+
+                res.status(200).json({
+                    'count': count,
+                    'prev': prevUrl,
+                    'next': nextUrl,
+                    'results': films.slice(currentOffset, currentOffset+currentLimit)
+                });
             })
             .catch(error => res.status(400).send(error));
     },
