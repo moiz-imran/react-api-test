@@ -1,15 +1,14 @@
 const express = require('express');
-const logger = require('morgan');
 const bodyParser = require('body-parser');
 const passport = require('passport');
 const session = require('express-session');
 const User = require('./server/models').User;
+const cors = require('cors');
 
 // Set up the express app
 const app = express();
 
-// Log requests to the console.
-// app.use(logger('dev'));
+app.use(cors());
 
 // Parse incoming requests data
 app.use(bodyParser.json());
@@ -59,17 +58,8 @@ app.disable('x-powered-by');
 
 app.disable('etag');
 
-// CORS
 app.use(function (req, res, next) {
-    // Website you wish to allow to connect
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    // Request methods you wish to allow
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
-    // Request headers you wish to allow
-    res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With, content-type, Authorization, Content-Type');
-    // Include cookies in requests (for session)
-    res.setHeader('Access-Control-Allow-Credentials', true);
-    // Pass to next layer of middleware
+    res.setHeader('Vary', 'Accept, Cookie');
     next();
 });
 
