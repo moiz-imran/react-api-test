@@ -21,9 +21,15 @@ module.exports = {
                         filmId: req.body.filmId,
                     })
                     .then(rating => res.status(201).send(rating))
-                    .catch(error => res.status(400).send(error));
+                    .catch(error => {
+                        if (error.errors) { return res.status(400).send({ message: error.errors[0].message }); }
+                        return res.status(400).send(error);
+                    });
             })
-            .catch(error => res.status(400).send(error));
+            .catch(error => {
+                if (error.errors) { return res.status(400).send({ message: error.errors[0].message }); }
+                return res.status(400).send(error);
+            });
     },
 
     list(req, res) { // Lists all ratings (score filtering and pagination)
@@ -66,7 +72,10 @@ module.exports = {
                     'results': ratings.slice(currentOffset, currentOffset + currentLimit)
                 });
             })
-            .catch(error => res.status(400).send(error));            
+            .catch(error => {
+                if (error.errors) { return res.status(400).send({ message: error.errors[0].message }); }
+                return res.status(400).send(error);
+            });
     },
 
     retrieve(req, res) { // Returns single rating by ID
@@ -84,7 +93,10 @@ module.exports = {
                 }
                 return res.status(200).send(rating);
             })
-            .catch(error => res.status(400).send(error));
+            .catch(error => {
+                if (error.errors) { return res.status(400).send({ message: error.errors[0].message }); }
+                return res.status(400).send(error);
+            });
     },
 
     update(req, res) { // Updates single rating by ID
@@ -106,9 +118,15 @@ module.exports = {
                         filmId: req.body.filmId || rating.filmId
                     })
                     .then(() => res.status(200).send(rating))
-                    .catch((error) => res.status(400).send(error));
+                    .catch(error => {
+                        if (error.errors) { return res.status(400).send({ message: error.errors[0].message }); }
+                        return res.status(400).send(error);
+                    });
             })
-            .catch((error) => res.status(400).send(error));
+            .catch(error => {
+                if (error.errors) { return res.status(400).send({ message: error.errors[0].message }); }
+                return res.status(400).send(error);
+            });
     },
 
     destroy(req, res) { // Deletes single rating by ID
@@ -127,8 +145,14 @@ module.exports = {
                 return rating
                     .destroy()
                     .then(() => res.status(204).send())
-                    .catch(error => res.status(400).send(error));
+                    .catch(error => {
+                        if (error.errors) { return res.status(400).send({ message: error.errors[0].message }); }
+                        return res.status(400).send(error);
+                    });
             })
-            .catch(error => res.status(400).send(error));
+            .catch(error => {
+                if (error.errors) { return res.status(400).send({ message: error.errors[0].message }); }
+                return res.status(400).send(error);
+            });
     }
 };

@@ -20,7 +20,10 @@ module.exports = {
                         return res.status(200).json(jwt.sign({ uuid: user.uuid }, process.env.JWT_ENCRYPTION));
                     })
                 })
-                .catch(error => res.status(400).send(error));
+                .catch(error => {
+                    if (error.errors) { return res.status(400).send({ message: error.errors[0].message }); }
+                    return res.status(400).send(error);
+                });
         } else {
             return res.status(401).send({ message: 'Sign up failed. Passwords don\'t match.' });
         }
@@ -49,7 +52,10 @@ module.exports = {
                     }
                 }                
             })
-            .catch(error => res.status(400).send(error));
+            .catch(error => {
+                if (error.errors) { return res.status(400).send({ message: error.errors[0].message }); }
+                return res.status(400).send(error);
+            });
     },
 
     logout(req, res) { // logs out user from req.user
@@ -67,7 +73,10 @@ module.exports = {
                     req.logout();
                     return res.status(200).json(jwt.sign({ uuid: user.uuid }, process.env.JWT_ENCRYPTION));
                 })
-                .catch(error => res.status(400).send(error));
+                .catch(error => {
+                    if (error.errors) { return res.status(400).send({ message: error.errors[0].message }); }
+                    return res.status(400).send(error);
+                });
         } else {
             return res.status(401).send({ message: 'Logout failed. No user logged in.' })
         }        
@@ -87,7 +96,10 @@ module.exports = {
                     }
                     return res.status(200).json(jwt.sign({ uuid: user.uuid }, process.env.JWT_ENCRYPTION));
                 })
-                .catch(error => res.status(400).send(error));
+                .catch(error => {
+                    if (error.errors) { return res.status(400).send({ message: error.errors[0].message }); }
+                    return res.status(400).send(error);
+                });
         } else {
             return res.status(401).send({ message: 'Not authorized. Need to login.' })
         }
@@ -108,7 +120,10 @@ module.exports = {
                     }
                     return res.status(200).send(user);
                 })
-                .catch(error => res.status(400).send(error));
+                .catch(error => {
+                    if (error.errors) { return res.status(400).send({ message: error.errors[0].message }); }
+                    return res.status(400).send(error);
+                });
         } else {
             return res.status(401).send({ message: 'Not authorized. Need to login.' })
         }
@@ -134,9 +149,15 @@ module.exports = {
                             email: req.body.email || user.email
                         })
                         .then(() => res.status(200).send(user))
-                        .catch(error => res.status(400).send(error));
+                        .catch(error => {
+                            if (error.errors) { return res.status(400).send({ message: error.errors[0].message }); }
+                            return res.status(400).send(error);
+                        });
                 })
-                .catch(error => res.status(400).send(error));
+                .catch(error => {
+                    if (error.errors) { return res.status(400).send({ message: error.errors[0].message }); }
+                    return res.status(400).send(error);
+                });
         } else {
             return res.status(401).send({ message: 'Not authorized. Need to login.' })
         }
@@ -161,7 +182,10 @@ module.exports = {
                         return user
                             .update({ raw_password: req.body.newPassword1 })
                             .then(() => res.status(200).json(jwt.sign({ uuid: user.uuid }, process.env.JWT_ENCRYPTION)))
-                            .catch(error => res.status(400).send(error));
+                            .catch(error => {
+                                if (error.errors) { return res.status(400).send({ message: error.errors[0].message }); }
+                                return res.status(400).send(error);
+                            });
                     })
             } else {
                 return res.status(401).send({ message: 'Not authorized. Need to login.' })

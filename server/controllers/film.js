@@ -9,21 +9,43 @@ module.exports = {
         return Film
             .create({
                 title: req.body.title,
-                description: req.body.description,
-                year: req.body.year
+                description: req.body.description || null,
+                year: req.body.year || null,
+                img_url: req.body.img_url || null,
+                ratings: []
+            }, {
+                include: [{
+                    model: Rating,
+                    as: 'ratings',
+                    attributes: { exclude: 'filmId' }
+                }],
             })
             .then(film => res.status(201).send(film))
-            .catch(error => res.status(400).send(error));
+            .catch(error => {
+                if (error.errors) { return res.status(400).send({ message: error.errors[0].message }); }
+                return res.status(400).send(error);
+            });
     },
 
     list(req, res) { // List all films (filters, calculates avg score, adds pagination)
-        const filterObj = {};
+        let filterObj = {};
         if (req.query.ids) filterObj.id = { [Op.in] : queryString.unescape(req.query.ids).split(',') };
         req.query.min_year = isNaN(req.query.min_year) ? '' : req.query.min_year;
         req.query.max_year = isNaN(req.query.max_year) ? '' : req.query.max_year;
         filterObj.year = { [Op.and] : { [Op.gte] : req.query.min_year || 1800, [Op.lte] : req.query.max_year || (new Date()).getFullYear() } };
-        if (req.query.title) filterObj.title = { [Op.iLike] : '%' + req.query.title + '%' };
-        if (req.query.description) filterObj.description = { [Op.iLike] : '%' + req.query.description + '%' };
+
+        if (req.query.title && req.query.description) {
+            const orObj = {
+                [Op.or]: {
+                    title: { [Op.iLike]: '%' + req.query.title + '%' },
+                    description: { [Op.iLike]: '%' + req.query.description + '%' }
+                } 
+            }
+            filterObj = { ...filterObj, ...orObj};
+        } else {
+            if (req.query.title) filterObj.title = { [Op.iLike]: '%' + req.query.title + '%' };
+            if (req.query.description) filterObj.description = { [Op.iLike]: '%' + req.query.description + '%' };
+        }
 
         return Film
             .findAll({
@@ -67,7 +89,10 @@ module.exports = {
                     'results': films.slice(currentOffset, currentOffset+currentLimit)
                 });
             })
-            .catch(error => res.status(400).send(error));
+            .catch(error => {
+                if (error.errors) { return res.status(400).send({ message: error.errors[0].message }); }
+                return res.status(400).send(error);
+            });
     },
 
     retrieve(req, res) { // Returns a single Film according to ID (calculates avg score)
@@ -93,7 +118,10 @@ module.exports = {
                 }
                 getScore();
             })
-            .catch(error => res.status(400).send(error));
+            .catch(error => {
+                if (error.errors) { return res.status(400).send({ message: error.errors[0].message }); }
+                return res.status(400).send(error);
+            });
     },
 
     update(req, res) { // Updates a single Film according to ID (calculates avg score to return Film)
@@ -126,9 +154,15 @@ module.exports = {
                         }
                         getScore();
                     })
-                    .catch((error) => res.status(400).send(error));
+                    .catch(error => {
+                        if (error.errors) { return res.status(400).send({ message: error.errors[0].message }); }
+                        return res.status(400).send(error);
+                    });
             })
-            .catch((error) => res.status(400).send(error));
+            .catch(error => {
+                if (error.errors) { return res.status(400).send({ message: error.errors[0].message }); }
+                return res.status(400).send(error);
+            });
     },
 
     destroy(req, res) { // Deletes a single film
@@ -143,8 +177,14 @@ module.exports = {
                 return film
                     .destroy()
                     .then(() => res.status(204).send())
-                    .catch(error => res.status(400).send(error));
+                    .catch(error => {
+                        if (error.errors) { return res.status(400).send({ message: error.errors[0].message }); }
+                        return res.status(400).send(error);
+                    });
             })
-            .catch(error => res.status(400).send(error));
+            .catch(error => {
+                if (error.errors) { return res.status(400).send({ message: error.errors[0].message }); }
+                return res.status(400).send(error);
+            });
     }
 };
